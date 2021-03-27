@@ -1,0 +1,19 @@
+{
+  "name": "pateo",
+  "version": "1.0.0",
+  "description": "TypeScript library for easy data handling in React based applications, transpiled to ES2015 JavaScript.",
+  "author": "Eric Kevrel",
+  "license": "MIT",
+  "repository": "0x2E757/Pateo",
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.3",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@0x2e757/wrappers": "^1.2.1"
+  }
+}
