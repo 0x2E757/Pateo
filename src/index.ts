@@ -1,1 +1,1 @@
-export { IWrapper, StaticWrapper, DynamicWrapper, subscribe } from "./wrappers";
+export { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper, subscribe } from "./wrappers";
