@@ -1,13 +1,17 @@
 import * as utils from "../utils";
+import * as components from "./components";
 import { DeepPartial, DeepReadonlyPartial } from "../types";
 import { Base } from "./base";
 import { Field } from "./field";
 
-export class Form<T = any> extends Base {
+export class Form<T = {}> extends Base {
 
     public lazy: boolean;
     public mutable: boolean;
     public values: DeepPartial<T>;
+
+    public Form: components.FormComponent<T>;
+    public Field: components.FieldComponent;
 
     private fields: Map<string, Field>;
 
@@ -16,6 +20,8 @@ export class Form<T = any> extends Base {
         this.lazy = true;
         this.mutable = true;
         this.values = {};
+        this.Form = components.getFormComponent(this);
+        this.Field = components.getFieldComponent(this);
         this.fields = new Map();
     }
 
@@ -31,10 +37,6 @@ export class Form<T = any> extends Base {
             this.fields.set(name, field);
         }
         return field;
-    }
-
-    public deleteField = (name: string): boolean => {
-        return this.fields.delete(name);
     }
 
     public submit = (callback: (values: DeepReadonlyPartial<T>) => void): void => {
