@@ -5,3 +5,8 @@ export type DeepReadonlyPartial<T> = { readonly [K in keyof T]?: T[K] extends Fu
 
 export type Constructor<T = any> = { new(...args: any[]): T };
 export type Subscriber<T = any> = (value: T) => void;
+
+export interface ISubscribable<T = any> {
+    subscribe: (subscriber: Subscriber<T>) => void;
+    unsubscribe: (subscriber: Subscriber<T>) => void;
+};

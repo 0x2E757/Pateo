@@ -12,7 +12,3 @@ export function uuid(): string {
     result[8] = result[13] = result[18] = result[23] = "-";
     return result.join("");
 }
-
-export function clone<T>(object: T): T {
-    return JSON.parse(JSON.stringify(object));
-}

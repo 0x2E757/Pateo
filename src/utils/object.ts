@@ -1,156 +1,110 @@
-enum AccessKind { None, Initial, ByDot, ByBrackets };
+enum AccessKind { Object, Array };
 
-interface IParserData {
-    value: any;
-    path: string;
-    partStartIndex: number;
-    partEndIndex: number;
+interface Path {
     accessKind: AccessKind;
-    numbersOnly: boolean;
+    name?: string;
+    index?: string | number;
+    next?: Path;
 }
 
 const codes = {
     dot: '.'.charCodeAt(0),
     openingBracket: '['.charCodeAt(0),
     closingBracket: ']'.charCodeAt(0),
-    quotes: '"'.charCodeAt(0),
     zero: '0'.charCodeAt(0),
     nine: '9'.charCodeAt(0),
 };
 
-const cloneRoot = (value: any): any => {
-    return typeof value == "object" ? Array.isArray(value) ? [...value] : { ...value } : value;
-}
-
-const getInitialData = (object: any, path: string): IParserData => {
-    return {
-        value: object,
-        path: path,
-        partStartIndex: 0,
-        partEndIndex: 0,
-        accessKind: AccessKind.Initial,
-        numbersOnly: true,
-    };
-}
-
-const updatePartBounds = (parserData: IParserData): void => {
-    while (parserData.partEndIndex < parserData.path.length) {
-        const charCode: number = parserData.path.charCodeAt(parserData.partEndIndex);
+const stringToPathObject = (string: string): Path => {
+    let path!: Path;
+    let numbersOnly: boolean;
+    let startIndex: number = string.length;
+    let currentIndex: number = startIndex;
+    while (currentIndex >= 0) {
+        const charCode: number = string.charCodeAt(currentIndex);
         switch (charCode) {
-            case codes.dot:
-                if (parserData.partStartIndex != parserData.partEndIndex) {
-                    parserData.numbersOnly = false;
-                    if (parserData.accessKind !== AccessKind.ByBrackets) {
-                        parserData.partEndIndex -= 1;
-                        return;
-                    }
-                }
-                parserData.accessKind = AccessKind.ByDot;
+            case codes.dot: {
+                const accessKind = AccessKind.Object;
+                const name = string.substring(currentIndex + 1, startIndex);
+                path = { accessKind, name, next: path };
+                startIndex = currentIndex;
                 break;
-            case codes.openingBracket:
-                if (parserData.partStartIndex != parserData.partEndIndex) {
-                    parserData.numbersOnly = false;
-                    parserData.partEndIndex -= 1;
-                    return;
-                }
-                parserData.accessKind = AccessKind.ByBrackets;
+            }
+            case codes.openingBracket: {
+                const accessKind = numbersOnly! ? AccessKind.Array : AccessKind.Object;
+                const index = string.substring(currentIndex + 1, startIndex - 1);
+                path = { accessKind, index: numbersOnly! ? Number(index) : index, next: path };
+                startIndex = currentIndex;
                 break;
-            case codes.closingBracket:
-                return;
-            default:
+            }
+            case codes.closingBracket: {
+                numbersOnly = true;
+                break;
+            }
+            default: {
                 if (charCode < codes.zero || charCode > codes.nine)
-                    parserData.numbersOnly = false;
+                    numbersOnly = false;
+                break;
+            }
         }
-        parserData.partEndIndex += 1;
+        currentIndex -= 1;
+    }
+    if (startIndex > 0) {
+        const accessKind = AccessKind.Object;
+        const name = string.substring(0, startIndex);
+        path = { accessKind, name, next: path };
+    }
+    return path;
+}
+
+const getInner = (object: any, path: Path): any => {
+    const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
+    if (path.next !== undefined) {
+        if (object[propertyName] === undefined)
+            return undefined;
+        return getInner(object[propertyName], path.next);
+    } else {
+        return object[propertyName];
     }
 }
 
-const parsePart = (parserData: IParserData): string => {
-    switch (parserData.accessKind) {
-        case AccessKind.None:
-            throw new Error(`Parse error, ensure path is valid.\r\nPath: ${parserData.path}`);
-        case AccessKind.Initial:
-            return parserData.path.substring(parserData.partStartIndex, parserData.partEndIndex + 1);
-        case AccessKind.ByDot:
-            return parserData.path.substring(parserData.partStartIndex + 1, parserData.partEndIndex + 1);
-        case AccessKind.ByBrackets:
-            return parserData.path.substring(parserData.partStartIndex + 1, parserData.partEndIndex);
+export const get = (object: any, path: string): any => {
+    let pathObject = stringToPathObject(path);
+    return getInner(object, pathObject);
+}
+
+const setInner = (object: any, path: Path, value: any): void => {
+    const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
+    if (path.next !== undefined) {
+        const propertyValue = object[propertyName] ?? (path.next.accessKind === AccessKind.Array ? [] : {});
+        setInner(object[propertyName] = propertyValue, path.next, value);
+    } else {
+        object[propertyName] = value;
     }
 }
 
-export const get = (object: any, path: string, throwOnFail: boolean = false): unknown => {
-    if (typeof object != "object")
-        throw new Error(`First argument value must be an object.`);
-    const parserData: IParserData = getInitialData(object, path);
-    while (parserData.partEndIndex < path.length) {
-        if (parserData.value === null || parserData.value === undefined) {
-            if (throwOnFail)
-                throw new Error(`Parse error, property does not exist, is undefined or null.\r\nPath: ${path.substring(0, parserData.partStartIndex)}\r\nFull: ${path}`);
-            else
-                return undefined;
-        }
-        updatePartBounds(parserData);
-        const part: string = parsePart(parserData);
-        const key: string | number = parserData.numbersOnly && part.length ? Number(part) : part;
-        parserData.value = parserData.value[key];
-        parserData.partStartIndex = parserData.partEndIndex + 1;
-        parserData.partEndIndex = parserData.partStartIndex;
-        parserData.accessKind = AccessKind.None;
-        parserData.numbersOnly = true;
-    }
-    return parserData.value;
+export const set = (object: any, path: string, value: any): void => {
+    setInner(object, stringToPathObject(path), value);
 }
 
-export const set = (object: any, path: string, value: any, immutable: boolean = false): any => {
-    if (typeof object != "object")
-        throw new Error(`First argument value must be an object.`);
-    const parserData: IParserData = getInitialData(object, path);
-    const result: any = immutable ? parserData.value = cloneRoot(object) : object;
-    while (parserData.partEndIndex < path.length) {
-        updatePartBounds(parserData);
-        const part: string = parsePart(parserData);
-        const key: string | number = parserData.numbersOnly && part.length ? Number(part) : part;
-        if (parserData.partEndIndex == (parserData.accessKind == AccessKind.ByBrackets ? path.length - 1 : path.length)) {
-            parserData.value[key] = value;
-            break;
-        } else {
-            if (parserData.value[key] === null || parserData.value[key] === undefined) {
-                parserData.value = parserData.value[key] = parserData.accessKind == AccessKind.ByBrackets && parserData.numbersOnly ? [] : {};
-            } else
-                if (typeof parserData.value[key] != "object")
-                    throw new Error(`Set error, property exist but is not an object.\r\nPath: ${path.substring(0, parserData.partEndIndex + 1)}\r\nFull: ${path}`);
-                else
-                    parserData.value = immutable ? parserData.value[key] = cloneRoot(parserData.value[key]) : parserData.value[key];
-            parserData.partStartIndex = parserData.partEndIndex + 1;
-            parserData.partEndIndex = parserData.partStartIndex;
-            parserData.accessKind = AccessKind.None;
-            parserData.numbersOnly = true;
-        }
-    }
-    return result;
+function delProperty(path: Path, object: any, propertyName: string | number) {
+    if (path.accessKind !== AccessKind.Array)
+        delete object[propertyName];
 }
 
-export const del = (object: any, path: string): any => {
-    if (typeof object != "object")
-        throw new Error(`First argument value must be an object.`);
-    const parserData: IParserData = getInitialData(object, path);
-    while (parserData.partEndIndex < path.length) {
-        if (parserData.value === null || parserData.value === undefined)
-            break;
-        updatePartBounds(parserData);
-        const part: string = parsePart(parserData);
-        const key: string | number = parserData.numbersOnly && part.length ? Number(part) : part;
-        if (parserData.partEndIndex == (parserData.accessKind == AccessKind.ByBrackets ? path.length - 1 : path.length)) {
-            const result: any = parserData.value[key];
-            delete parserData.value[key];
-            return result;
-        } else {
-            parserData.value = parserData.value[key];
-            parserData.partStartIndex = parserData.partEndIndex + 1;
-            parserData.partEndIndex = parserData.partStartIndex;
-            parserData.accessKind = AccessKind.None;
-            parserData.numbersOnly = true;
-        }
+const delInner = (object: any, path: Path): void => {
+    const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
+    if (path.next !== undefined) {
+        const propertyValue = object[propertyName] ?? (path.next.accessKind === AccessKind.Array ? [] : {});
+        delInner(object[propertyName] = propertyValue, path.next);
+        if ((path.next.accessKind === AccessKind.Array ? object[propertyName] : Object.keys(object[propertyName])).length == 0)
+            delProperty(path, object, propertyName);
+    } else {
+        delProperty(path, object, propertyName);
     }
-    return undefined;
+}
+
+export const del = (object: any, path: string): void => {
+    let pathObject = stringToPathObject(path);
+    delInner(object, pathObject);
 }
