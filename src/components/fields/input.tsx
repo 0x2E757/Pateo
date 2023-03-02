@@ -18,6 +18,6 @@ export function getInputComponent(form: Form) {
 
     }
     Object.defineProperty(InputComponent, "name", { value: "Input" });
-    Object.defineProperty(InputComponent, "displayName", { value: `(${form.name}) Input` });
+    Object.defineProperty(InputComponent, "displayName", { value: `(${form.name})(Input)` });
     return InputComponent;
 }

@@ -22,6 +22,6 @@ export function getFieldComponent(form: Form) {
 
     }
     Object.defineProperty(FieldComponent, "name", { value: "Field" });
-    Object.defineProperty(FieldComponent, "displayName", { value: `(${form.name}) Field` });
+    Object.defineProperty(FieldComponent, "displayName", { value: `(${form.name})(Field)` });
     return FieldComponent;
 }

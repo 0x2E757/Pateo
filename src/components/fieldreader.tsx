@@ -12,7 +12,7 @@ interface IFieldReaderProps {
 }
 
 export function getFieldReaderComponent(form: Form) {
-    class FieldReader extends React.PureComponent<Extend<PropsBase, IFieldReaderProps>> {
+    class FieldReaderComponent extends React.PureComponent<Extend<PropsBase, IFieldReaderProps>> {
 
         private field: Field;
 
@@ -45,7 +45,7 @@ export function getFieldReaderComponent(form: Form) {
         }
 
     }
-    Object.defineProperty(FieldReader, "name", { value: "Field Reader" });
-    Object.defineProperty(FieldReader, "displayName", { value: `(${form.name}) Field Reader` });
-    return FieldReader;
+    Object.defineProperty(FieldReaderComponent, "name", { value: "Field Reader" });
+    Object.defineProperty(FieldReaderComponent, "displayName", { value: `(${form.name})(Field Reader)` });
+    return FieldReaderComponent;
 }

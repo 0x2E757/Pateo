@@ -4,7 +4,7 @@ import { Form } from "../form";
 type SubmitPropsBase = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 export function getSubmitComponent(form: Form) {
-    class Component extends React.PureComponent<SubmitPropsBase> {
+    class SubmitComponent extends React.PureComponent<SubmitPropsBase> {
 
         private onSubmit = (event: React.ChangeEvent<HTMLInputElement>): void => {
             event.preventDefault();
@@ -16,7 +16,7 @@ export function getSubmitComponent(form: Form) {
         }
 
     }
-    Object.defineProperty(Component, "name", { value: "Submit" });
-    Object.defineProperty(Component, "displayName", { value: `(${form.name}) Submit` });
-    return Component;
+    Object.defineProperty(SubmitComponent, "name", { value: "Submit" });
+    Object.defineProperty(SubmitComponent, "displayName", { value: `(${form.name})(Submit)` });
+    return SubmitComponent;
 }

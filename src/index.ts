@@ -35,7 +35,7 @@ export const subscribe = (...subscribables: ISubscribable[]) => {
             }
         }
         Object.defineProperty(SubscribedComponent, "name", { value: component.name });
-        Object.defineProperty(SubscribedComponent, "displayName", { value: `Subscribed (${component.name})` });
+        Object.defineProperty(SubscribedComponent, "displayName", { value: `(Subscribed)(${component.name})` });
         return SubscribedComponent;
     }
 }

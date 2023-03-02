@@ -39,6 +39,6 @@ export function getBaseComponent<P, S = {}>(form: Form) {
 
     }
     Object.defineProperty(BaseComponent, "name", { value: "Field Base" });
-    Object.defineProperty(BaseComponent, "displayName", { value: `(${form.name}) Field Base` });
+    Object.defineProperty(BaseComponent, "displayName", { value: `(${form.name})(Field Base)` });
     return BaseComponent;
 }

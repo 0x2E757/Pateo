@@ -36,6 +36,6 @@ export function getFormComponent<T>(form: Form<T>) {
 
     }
     Object.defineProperty(FormComponent, "name", { value: "Form" });
-    Object.defineProperty(FormComponent, "displayName", { value: `(${form.name}) Form` });
+    Object.defineProperty(FormComponent, "displayName", { value: `(${form.name})(Form)` });
     return FormComponent;
 }

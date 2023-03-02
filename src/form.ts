@@ -8,6 +8,7 @@ export class Form<T = {}> {
     public readonly name: string;
     public readonly Form: ReturnType<typeof components.getFormComponent>;
     public readonly Submit: ReturnType<typeof components.getSubmitComponent>;
+    public readonly Reset: ReturnType<typeof components.getResetComponent>;
     public readonly Field: ReturnType<typeof components.getFieldComponent>;
     public readonly Input: ReturnType<typeof components.getInputComponent>;
     public readonly FieldReader: ReturnType<typeof components.getFieldReaderComponent>;
@@ -22,6 +23,7 @@ export class Form<T = {}> {
         this.name = name ?? utils.uuid();
         this.Form = components.getFormComponent(this);
         this.Submit = components.getSubmitComponent(this);
+        this.Reset = components.getResetComponent(this);
         this.Field = components.getFieldComponent(this);
         this.Input = components.getInputComponent(this);
         this.FieldReader = components.getFieldReaderComponent(this);
@@ -46,6 +48,12 @@ export class Form<T = {}> {
             this.fields.set(name, field);
         }
         return field;
+    }
+
+    public reset = (): void => {
+        const keys = this.fields.keys();
+        for (const key of keys)
+            this.fields.get(key)!.reset();
     }
 
     public submit = (callback?: (values: DeepReadonlyPartial<T>) => void): void => {
