@@ -1,19 +1,28 @@
 import * as React from "react";
+import { Extend } from "../../types";
 import { Form } from "../../form";
 import { getBaseComponent } from "./base";
 
 type InputPropsBase = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
+interface IInputProps {
+    initialValue?: string | number;
+    defaultValue?: string | number;
+}
+
 export function getInputComponent(form: Form) {
-    class InputComponent extends getBaseComponent<InputPropsBase>(form) {
+    class InputComponent extends getBaseComponent<Extend<InputPropsBase, IInputProps>>(form) {
 
         private onChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
             this.field.change(event.target.value);
         }
 
         public render = (): JSX.Element => {
+            const { initialValue, defaultValue, ...props } = this.props;
             this.updateField();
-            return <input {...this.props} value={this.field.value ?? ""} onChange={this.onChange} />;
+            this.field.setInitialValue(initialValue);
+            this.field.setDefaultValue(defaultValue);
+            return <input {...props} value={this.field.value ?? ""} onChange={this.onChange} />;
         }
 
     }
