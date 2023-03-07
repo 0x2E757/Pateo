@@ -1,5 +1,8 @@
 import * as React from "react";
 
+import { PromiseExt } from "@0x2e757/promise-ext";
+export { PromiseExt };
+
 import { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper } from "@0x2e757/wrappers";
 export { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper };
 
@@ -46,6 +49,7 @@ export const subscribe = (...subscribables: ISubscribable[]) => {
 }
 
 export default {
+    PromiseExt,
     StaticWrapper, 
     DynamicWrapper,
     Form,
