@@ -3,13 +3,13 @@ import { Extend } from "../../types";
 import { Form } from "../../form";
 import { Field } from "../../field";
 
-interface IFieldProps {
+export interface IFieldProps {
     name: string;
 }
 
 export function getBaseComponent<P, S = {}>(form: Form) {
     class BaseComponent extends React.PureComponent<Extend<P, IFieldProps>, S> {
-
+        
         protected field: Field;
 
         constructor(props: Extend<P, IFieldProps>) {
