@@ -1,11 +1,16 @@
 import * as React from "react";
+
+import { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper } from "@0x2e757/wrappers";
+export { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper };
+
 import { Constructor, ISubscribable } from "./types";
+export { Constructor, ISubscribable };
 
-export type { IWrapper, IStaticWrapper, IDynamicWrapper } from "@0x2e757/wrappers";
+import { Form } from "./form";
+export { Form };
 
-export { StaticWrapper, DynamicWrapper } from "@0x2e757/wrappers";
-export { Form } from "./form";
-export { Field } from "./field";
+import { Field } from "./field";
+export { Field };
 
 export const subscribe = (...subscribables: ISubscribable[]) => {
     return <T extends Constructor<React.Component>>(component: T): T => {
@@ -39,3 +44,11 @@ export const subscribe = (...subscribables: ISubscribable[]) => {
         return SubscribedComponent;
     }
 }
+
+export default {
+    StaticWrapper, 
+    DynamicWrapper,
+    Form,
+    Field,
+    subscribe,
+};
