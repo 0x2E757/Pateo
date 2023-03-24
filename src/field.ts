@@ -3,8 +3,7 @@ import { Form } from "./form";
 
 export class Field {
 
-    private readonly form: Form;
-
+    public readonly form: Form;
     public readonly name: string;
 
     public initialValue: any;
