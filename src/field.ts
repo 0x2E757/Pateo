@@ -66,8 +66,9 @@ export class Field {
         }
     }
 
-    public setErrors = (errors: string[]): void => {
+    public setSubmissionErrors = (errors: string[]): void => {
         this.errors = errors;
+        this.submitFailed = true;
         this.trigger();
     }
 

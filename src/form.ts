@@ -1,6 +1,6 @@
 import * as utils from "./utils";
 import * as components from "./components";
-import { DeepPartial, DeepReadonlyPartial, Subscriber, ValidationErrors } from "./types";
+import { DeepPartial, DeepReadonlyPartial, Subscriber } from "./types";
 import { Field } from "./field";
 
 export class Form<T = {}> {
@@ -41,11 +41,11 @@ export class Form<T = {}> {
         this.trigger();
     }
 
-    public setValidationErrors = (errors: Object): void => {
+    public setSubmissionErrors = (errors: Object): void => {
         const flattenedErrors = utils.flattenObject(errors);
         for (const fieldName in flattenedErrors) {
             const fieldErrors = typeof flattenedErrors[fieldName] == "string" ? [flattenedErrors[fieldName] as string] : flattenedErrors[fieldName] as string[];
-            this.getField(fieldName).setErrors(fieldErrors);
+            this.getField(fieldName).setSubmissionErrors(fieldErrors);
         }
     }
 
