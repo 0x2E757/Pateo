@@ -52,7 +52,7 @@ export class Field {
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => this.change(event.target.value),
             onFocus: () => this.focus(),
             onBlur: () => this.blur(),
-            value: this.value,
+            value: "",
         }
 
         this.subscribers = new Set();
@@ -112,7 +112,7 @@ export class Field {
 
     public change = (value: any): void => {
         this.value = value;
-        this.inputProps.value = value;
+        this.inputProps.value = value ?? "";
         this.form.setValue(this.name, value);
         this.validate();
         this.trigger();
