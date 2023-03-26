@@ -1,6 +1,6 @@
 import * as utils from "./utils";
 import * as components from "./components";
-import { DeepPartial, DeepReadonlyPartial, Subscriber } from "./types";
+import { DeepPartial, DeepReadonlyPartial, Subscriber, ValidationErrors } from "./types";
 import { Field } from "./field";
 
 export class Form<T = {}> {
@@ -64,13 +64,29 @@ export class Form<T = {}> {
             this.fields.get(key)!.reset();
     }
 
+    private checkCanSubmit = (): boolean => {
+        let allValid = true;
+        const keys = this.fields.keys();
+        for (const key of keys) {
+            const field = this.fields.get(key)!;
+            field.submitFailed = field.validate() === false;
+            if (field.submitFailed) {
+                field.trigger();
+                allValid = false;
+            }
+        }
+        return allValid;
+    }
+
     public submit = (callback?: (values: DeepReadonlyPartial<T>) => void): void => {
-        if (callback)
-            callback(this.values);
-        else if (this.onSubmit)
-            this.onSubmit(this.values);
-        else
-            console.warn(`Unhandled submit of ${this.name}`, this.values);
+        if (this.checkCanSubmit()) {
+            if (callback)
+                callback(this.values);
+            else if (this.onSubmit)
+                this.onSubmit(this.values);
+            else
+                console.warn(`Unhandled submit of ${this.name}`, this.values);
+        }
     }
 
     public subscribe = (subscriber: Subscriber<DeepPartial<T>>): void => {

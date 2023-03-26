@@ -2,6 +2,7 @@ import { Validator, Subscriber } from "./types";
 import { Form } from "./form";
 
 type InputProps = {
+    name: string,
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
     onFocus: (event: React.FocusEvent<HTMLInputElement>) => void,
     onBlur: (event: React.FocusEvent<HTMLInputElement>) => void,
@@ -23,29 +24,39 @@ export class Field {
     public active: boolean;
     public visited: boolean;
     public touched: boolean;
+    public submitFailed: boolean;
 
     public inputProps: InputProps;
 
     private subscribers: Set<Subscriber>;
 
     public constructor(form: Form, name: string) {
+
         this.form = form;
         this.name = name;
+
         this.validators = [];
         this.errors = [];
+
         this.initialValue = undefined;
         this.defaultValue = undefined;
         this.value = undefined;
+
         this.active = false;
         this.visited = false;
         this.touched = false;
+        this.submitFailed = false;
+
         this.inputProps = {
+            name: name,
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => this.change(event.target.value),
             onFocus: () => this.focus(),
             onBlur: () => this.blur(),
             value: this.value,
         }
+
         this.subscribers = new Set();
+
     }
 
     public setValidators = (validators: Validator[]): void => {
