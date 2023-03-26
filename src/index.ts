@@ -71,6 +71,11 @@ export const useSubscribable = <T>(wrapper: IWrapper<T>) => {
     return value;
 };
 
+export const useForm = <T>(name?: string) => {
+    const [form] = React.useState(new Form<T>(name));
+    return form;
+};
+
 export default {
     PromiseExt,
     StaticWrapper,
