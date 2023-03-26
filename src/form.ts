@@ -45,15 +45,16 @@ export class Form<T = {}> {
         const flattenedErrors = utils.flattenObject(errors);
         for (const fieldName in flattenedErrors) {
             const fieldErrors = typeof flattenedErrors[fieldName] == "string" ? [flattenedErrors[fieldName] as string] : flattenedErrors[fieldName] as string[];
-            this.getField(fieldName).setSubmissionErrors(fieldErrors);
+            this.getField(fieldName.toLocaleLowerCase()).setSubmissionErrors(fieldErrors);
         }
     }
 
     public getField = (name: string): Field => {
-        let field: Field | undefined = this.fields.get(name);
+        const nameLowerCase = name.toLocaleLowerCase();
+        let field: Field | undefined = this.fields.get(nameLowerCase);
         if (field === undefined) {
-            field = new Field(this, name);
-            this.fields.set(name, field);
+            field = new Field(this, nameLowerCase);
+            this.fields.set(nameLowerCase, field);
         }
         return field;
     }
