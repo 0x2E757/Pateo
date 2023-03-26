@@ -1,6 +1,6 @@
 {
   "name": "pateo",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "TypeScript library for easy data handling in React based applications, transpiled to ES2015 JavaScript.",
   "author": "Eric Kevrel",
   "license": "MIT",

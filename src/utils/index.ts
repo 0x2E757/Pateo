@@ -27,3 +27,10 @@ export function flattenObject(object: any, parentPropertyName?: string, result: 
     }
     return result;
 }
+
+export function lowerCaseKeys(object: any) {
+    const result: any = {};
+    for (const key in object)
+        result[key.toLowerCase()] = object[key];
+    return result;
+}

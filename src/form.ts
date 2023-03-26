@@ -42,15 +42,22 @@ export class Form<T = {}> {
     }
 
     public setSubmissionErrors = (errors: Object): void => {
-        const flattenedErrors = utils.flattenObject(errors);
-        for (const fieldName in flattenedErrors) {
-            const fieldErrors = typeof flattenedErrors[fieldName] == "string" ? [flattenedErrors[fieldName] as string] : flattenedErrors[fieldName] as string[];
-            this.getField(fieldName.toLocaleLowerCase()).setSubmissionErrors(fieldErrors);
+        const normalizedErrors = utils.lowerCaseKeys(utils.flattenObject(errors));
+        const keys = this.fields.keys();
+        for (const key of keys) {
+            if (key in normalizedErrors) {
+                const fieldErrors = typeof normalizedErrors[key] == "string" ? [normalizedErrors[key] as string] : normalizedErrors[key] as string[];
+                this.getField(key.toLowerCase()).setSubmissionErrors(fieldErrors);
+            } else {
+                const field = this.fields.get(key)!;
+                field.validate();
+                field.trigger();
+            }
         }
     }
 
     public getField = (name: string): Field => {
-        const nameLowerCase = name.toLocaleLowerCase();
+        const nameLowerCase = name.toLowerCase();
         let field: Field | undefined = this.fields.get(nameLowerCase);
         if (field === undefined) {
             field = new Field(this, nameLowerCase);
