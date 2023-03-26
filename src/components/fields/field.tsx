@@ -1,24 +1,24 @@
 import * as React from "react";
-import { Extend } from "../../types";
+import { Validator, Extend } from "../../types";
 import { Form } from "../../form";
-import { Field } from "../../field";
 import { getBaseComponent } from "./base";
 
 type PropsBase = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 interface IFieldProps {
-    name: string;
+    validate?: Validator | Validator[];
     initialValue?: any;
     defaultValue?: any;
-    component: React.ComponentClass<{ field: Field }>;
+    component: React.JSXElementConstructor<any>;
 }
 
 export function getFieldComponent(form: Form) {
     class FieldComponent extends getBaseComponent<Extend<PropsBase, IFieldProps>>(form) {
 
         public render = (): JSX.Element => {
-            const { component, initialValue, defaultValue, ...props } = this.props;
+            const { name, validate, initialValue, defaultValue, component, ...props } = this.props;
             this.updateField();
+            this.field.setValidators(validate === undefined ? [] : Array.isArray(validate) ? validate : [validate]);
             this.field.setInitialValue(initialValue);
             this.field.setDefaultValue(defaultValue);
             return React.createElement(component, { field: this.field, ...props });

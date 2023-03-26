@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Extend } from "../../types";
+import { Validator, Extend } from "../../types";
 import { Form } from "../../form";
 import { getBaseComponent } from "./base";
 
 type InputPropsBase = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 
 interface IInputProps {
+    validate?: Validator | Validator[];
     initialValue?: string | number;
     defaultValue?: string | number;
 }
@@ -18,8 +19,9 @@ export function getInputComponent(form: Form) {
         }
 
         public render = (): JSX.Element => {
-            const { initialValue, defaultValue, ...props } = this.props;
+            const { validate, initialValue, defaultValue, ...props } = this.props;
             this.updateField();
+            this.field.setValidators(validate === undefined ? [] : Array.isArray(validate) ? validate : [validate]);
             this.field.setInitialValue(initialValue);
             this.field.setDefaultValue(defaultValue);
             return <input {...props} value={this.field.value ?? ""} onChange={this.onChange} />;

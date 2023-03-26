@@ -41,6 +41,14 @@ export class Form<T = {}> {
         this.trigger();
     }
 
+    public setValidationErrors = (errors: Object): void => {
+        const flattenedErrors = utils.flattenObject(errors);
+        for (const fieldName in flattenedErrors) {
+            const fieldErrors = typeof flattenedErrors[fieldName] == "string" ? [flattenedErrors[fieldName] as string] : flattenedErrors[fieldName] as string[];
+            this.getField(fieldName).setErrors(fieldErrors);
+        }
+    }
+
     public getField = (name: string): Field => {
         let field: Field | undefined = this.fields.get(name);
         if (field === undefined) {

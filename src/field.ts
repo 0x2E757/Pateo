@@ -1,31 +1,75 @@
-import { Subscriber } from "./types";
+import { Validator, Subscriber } from "./types";
 import { Form } from "./form";
+
+type InputProps = {
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+    onFocus: (event: React.FocusEvent<HTMLInputElement>) => void,
+    onBlur: (event: React.FocusEvent<HTMLInputElement>) => void,
+    value: any,
+}
 
 export class Field {
 
     public readonly form: Form;
     public readonly name: string;
 
+    public validators: Validator[];
+    public errors: string[];
+
     public initialValue: any;
     public defaultValue: any;
     public value: any;
+
+    public active: boolean;
+    public visited: boolean;
+    public touched: boolean;
+
+    public inputProps: InputProps;
 
     private subscribers: Set<Subscriber>;
 
     public constructor(form: Form, name: string) {
         this.form = form;
         this.name = name;
+        this.validators = [];
+        this.errors = [];
         this.initialValue = undefined;
         this.defaultValue = undefined;
         this.value = undefined;
+        this.active = false;
+        this.visited = false;
+        this.touched = false;
+        this.inputProps = {
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => this.change(event.target.value),
+            onFocus: () => this.focus(),
+            onBlur: () => this.blur(),
+            value: this.value,
+        }
         this.subscribers = new Set();
+    }
+
+    public setValidators = (validators: Validator[]): void => {
+        if (this.validators[0] !== validators[0]) {
+            this.validators = validators;
+            this.validate();
+        }
+    }
+
+    public setErrors = (errors: string[]): void => {
+        this.errors = errors;
+        this.trigger();
     }
 
     public setInitialValue = (value: any): void => {
         if (this.initialValue !== value && value !== undefined) {
             this.initialValue = value;
-            if (this.value === undefined)
-                this.change(value);
+            if (this.value === undefined) {
+                this.value = value;
+                this.inputProps.value = value;
+                this.form.setValue(this.name, value);
+                this.validate();
+                this.trigger();
+            }
         }
     }
 
@@ -37,8 +81,34 @@ export class Field {
         }
     }
 
+    public validate = (): boolean => {
+        const errors = [];
+        for (const validator of this.validators) {
+            const result = validator(this.value);
+            if (result !== undefined)
+                errors.push(result);
+        }
+        this.errors = errors;
+        return errors.length === 0;
+    }
+
+    public focus = (): void => {
+        this.active = true;
+        this.visited = true;
+        this.trigger();
+    }
+
     public change = (value: any): void => {
-        this.form.setValue(this.name, this.value = value);
+        this.value = value;
+        this.inputProps.value = value;
+        this.form.setValue(this.name, value);
+        this.validate();
+        this.trigger();
+    }
+
+    public blur = (): void => {
+        this.active = false;
+        this.touched = this.visited;
         this.trigger();
     }
 

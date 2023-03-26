@@ -4,10 +4,11 @@ import { PromiseExt } from "@0x2e757/promise-ext";
 export { PromiseExt };
 
 import { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper } from "@0x2e757/wrappers";
-export { IWrapper, StaticWrapper, IStaticWrapper, DynamicWrapper, IDynamicWrapper };
+export type { IWrapper, IStaticWrapper, IDynamicWrapper };
+export { StaticWrapper, DynamicWrapper };
 
 import { Constructor, ISubscribable } from "./types";
-export { Constructor, ISubscribable };
+export type { Constructor, ISubscribable };
 
 import { Form } from "./form";
 export { Form };
@@ -50,7 +51,7 @@ export const subscribe = (...subscribables: ISubscribable[]) => {
 
 export default {
     PromiseExt,
-    StaticWrapper, 
+    StaticWrapper,
     DynamicWrapper,
     Form,
     Field,
