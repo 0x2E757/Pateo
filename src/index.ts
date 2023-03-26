@@ -49,6 +49,28 @@ export const subscribe = (...subscribables: ISubscribable[]) => {
     }
 }
 
+export const useWrapper = <T>(wrapper: IStaticWrapper<T>) => {
+    const [value, setValue] = React.useState<T>(wrapper.emit());
+    React.useEffect(() => {
+        wrapper.subscribe(setValue);
+        return () => {
+            wrapper.unsubscribe(setValue);
+        };
+    });
+    return [value, wrapper.set] as [T, typeof wrapper.set];
+};
+
+export const useSubscribable = <T>(wrapper: IWrapper<T>) => {
+    const [value, setValue] = React.useState<T>(wrapper.emit());
+    React.useEffect(() => {
+        wrapper.subscribe(setValue);
+        return () => {
+            wrapper.unsubscribe(setValue);
+        };
+    });
+    return value;
+};
+
 export default {
     PromiseExt,
     StaticWrapper,
@@ -56,4 +78,6 @@ export default {
     Form,
     Field,
     subscribe,
+    useWrapper,
+    useSubscribable,
 };
