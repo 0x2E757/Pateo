@@ -1,10 +1,10 @@
 enum AccessKind { Object, Array };
 
-interface Path {
-    accessKind: AccessKind;
-    name?: string;
-    index?: string | number;
-    next?: Path;
+type Path = {
+    accessKind: AccessKind,
+    name?: string,
+    index?: string | number,
+    next?: Path,
 }
 
 const codes = {
@@ -57,6 +57,22 @@ const stringToPathObject = (string: string): Path => {
     return path;
 }
 
+const existsInner = (object: any, path: Path): any => {
+    const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
+    if (path.next !== undefined) {
+        if (object[propertyName] === undefined)
+            return false;
+        return existsInner(object[propertyName], path.next);
+    } else {
+        return true;
+    }
+}
+
+export const exists = (object: any, path: string): any => {
+    let pathObject = stringToPathObject(path);
+    return existsInner(object, pathObject);
+}
+
 const getInner = (object: any, path: Path): any => {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
@@ -87,24 +103,26 @@ export const set = (object: any, path: string, value: any): void => {
     setInner(object, stringToPathObject(path), value);
 }
 
-function delProperty(path: Path, object: any, propertyName: string | number) {
+const deleleProperty = (path: Path, object: any, propertyName: string | number): void => {
     if (path.accessKind !== AccessKind.Array)
         delete object[propertyName];
+    else
+        object[propertyName] = null;
 }
 
-const delInner = (object: any, path: Path): void => {
+const removeInner = (object: any, path: Path): void => {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
         const propertyValue = object[propertyName] ?? (path.next.accessKind === AccessKind.Array ? [] : {});
-        delInner(object[propertyName] = propertyValue, path.next);
+        removeInner(object[propertyName] = propertyValue, path.next);
         if ((path.next.accessKind === AccessKind.Array ? object[propertyName] : Object.keys(object[propertyName])).length == 0)
-            delProperty(path, object, propertyName);
+            deleleProperty(path, object, propertyName);
     } else {
-        delProperty(path, object, propertyName);
+        deleleProperty(path, object, propertyName);
     }
 }
 
-export const del = (object: any, path: string): void => {
+export const remove = (object: any, path: string): void => {
     let pathObject = stringToPathObject(path);
-    delInner(object, pathObject);
+    removeInner(object, pathObject);
 }

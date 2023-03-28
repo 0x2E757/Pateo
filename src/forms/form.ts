@@ -11,6 +11,7 @@ export class Form<T = {}> {
     public readonly Reset: ReturnType<typeof components.getResetComponent>;
     public readonly Field: ReturnType<typeof components.getFieldComponent>;
     public readonly Input: ReturnType<typeof components.getInputComponent>;
+    public readonly FieldArray: ReturnType<typeof components.getFieldArrayComponent>;
     public readonly FieldReader: ReturnType<typeof components.getFieldReaderComponent>;
 
     public onSubmit?: (values: DeepReadonlyPartial<T>) => void;
@@ -26,6 +27,7 @@ export class Form<T = {}> {
         this.Reset = components.getResetComponent(this);
         this.Field = components.getFieldComponent(this);
         this.Input = components.getInputComponent(this);
+        this.FieldArray = components.getFieldArrayComponent(this);
         this.FieldReader = components.getFieldReaderComponent(this);
         this.onSubmit = undefined;
         this.values = {};
@@ -33,17 +35,29 @@ export class Form<T = {}> {
         this.subscribers = new Set();
     }
 
+    public getKeys = (): IterableIterator<string> => {
+        return this.fields.keys();
+    }
+
+    public valueExists = (path: string): boolean => {
+        return utils.exists(this.values, path);
+    }
+
+    public getValue = (path: string): void => {
+        return utils.get(this.values, path);
+    }
+
     public setValue = (path: string, value: any): void => {
         if (value !== undefined && value !== "")
             utils.set(this.values, path, value);
         else
-            utils.del(this.values, path);
+            utils.remove(this.values, path);
         this.trigger();
     }
 
     public setSubmissionErrors = (errors: Object): void => {
         const normalizedErrors = utils.lowerCaseKeys(utils.flattenObject(errors));
-        const keys = this.fields.keys();
+        const keys = this.getKeys();
         for (const key of keys) {
             if (key in normalizedErrors) {
                 const fieldErrors = typeof normalizedErrors[key] == "string" ? [normalizedErrors[key] as string] : normalizedErrors[key] as string[];
@@ -66,19 +80,24 @@ export class Form<T = {}> {
         return field;
     }
 
+    public removeField = (name: string): boolean => {
+        const nameLowerCase = name.toLowerCase();
+        return this.fields.delete(nameLowerCase);
+    }
+
     public getValues = (): DeepReadonlyPartial<T> => {
         return { ...this.values };
     }
 
     public reset = (): void => {
-        const keys = this.fields.keys();
+        const keys = this.getKeys();
         for (const key of keys)
             this.fields.get(key)!.reset();
     }
 
     private checkCanSubmit = (): boolean => {
         let allValid = true;
-        const keys = this.fields.keys();
+        const keys = this.getKeys();
         for (const key of keys) {
             const field = this.fields.get(key)!;
             field.submitFailed = field.validate() === false;

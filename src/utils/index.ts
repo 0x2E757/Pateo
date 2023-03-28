@@ -1,5 +1,5 @@
 import { ValidationErrors } from "../types";
-export { get, set, del } from "./object";
+export { exists, get, set, remove } from "./object";
 
 export function uuid(): string {
     // https://stackoverflow.com/a/873856

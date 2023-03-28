@@ -128,13 +128,71 @@ export class Field {
         if (this.value !== this.defaultValue) {
             this.value = this.defaultValue;
             this.inputProps.value = this.defaultValue ?? "";
-            this.form.setValue(this.name, this.defaultValue);
+            if (this.form.valueExists(this.name))
+                this.form.setValue(this.name, this.defaultValue);
         }
         this.visited = false;
         this.touched = false;
         this.submitFailed = false;
         this.validate();
         this.trigger();
+    }
+
+    public push = (value: any = null): void => {
+        this.change([...(this.value ?? []), value]);
+    }
+
+    private getKeysListsFlags = () => {
+        const keys = this.form.getKeys();
+        const keysList: any = [];
+        const keysFlags: any = {};
+        for (const key of keys)
+            if (key.startsWith(this.name + "[")) {
+                keysList.push(key);
+                keysFlags[key] = false;
+            }
+        return [keysList, keysFlags];
+    }
+
+    private import = (field: Field): void => {
+        this.validators = field.validators;
+        this.errors = field.errors;
+        this.initialValue = field.initialValue;
+        this.defaultValue = field.defaultValue;
+        this.value = field.value;
+        this.active = field.active;
+        this.visited = field.visited;
+        this.touched = field.touched;
+        this.submitFailed = field.submitFailed;
+        this.inputProps = {
+            ...this.inputProps,
+            value: field.value,
+        };
+        this.trigger();
+    }
+
+    public remove = (index: number): void => {
+        const [keysList, keysFlags] = this.getKeysListsFlags();
+        for (let n = index; n < this.value.length; n += 1) {
+            if (n < this.value.length - 1)
+                for (const key of keysList) {
+                    const prefix = `${this.name}[${n + 1}]`;
+                    if (key.startsWith(prefix)) {
+                        const name = key.substring(prefix.length);
+                        const keyTarget = `${this.name}[${n}]${name}`;
+                        this.form.getField(keyTarget).import(this.form.getField(key));
+                        keysFlags[keyTarget] = true;
+                    }
+                }
+            for (const key of keysList) {
+                const prefix = `${this.name}[${n}]`;
+                if (key.startsWith(prefix))
+                    if (keysFlags[key] === false)
+                        this.form.removeField(key);
+            }
+        }
+        this.value.splice(index, 1);
+        this.change(this.value);
     }
 
     public subscribe = (subscriber: Subscriber): void => {

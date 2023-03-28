@@ -5,21 +5,23 @@ import { Form, Field } from "../forms";
 type PropsBase = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 type ChildrenProps = {
-    value: any,
+    names: string[],
+    push: (value: any) => void,
+    remove: (index: number) => void,
 };
 
-export type FieldReaderProps = {
+export type FieldArrayProps = {
     name: string,
     children?: (props: ChildrenProps) => JSX.Element,
     component?: (props: ChildrenProps) => JSX.Element,
 };
 
-export function getFieldReaderComponent(form: Form) {
-    class FieldReaderComponent extends React.PureComponent<Extend<PropsBase, FieldReaderProps>> {
+export function getFieldArrayComponent(form: Form) {
+    class FieldArrayComponent extends React.PureComponent<Extend<PropsBase, FieldArrayProps>> {
 
         private field: Field;
 
-        constructor(props: Extend<PropsBase, FieldReaderProps>) {
+        constructor(props: Extend<PropsBase, FieldArrayProps>) {
             super(props);
             this.field = form.getField(props.name);
         }
@@ -40,15 +42,17 @@ export function getFieldReaderComponent(form: Form) {
             if (this.field.name !== this.props.name) {
                 this.field.unsubscribe(this.fourceUpdateWrapper);
                 this.field = form.getField(this.props.name);
+                this.field.setDefaultValue([]);
                 this.field.subscribe(this.fourceUpdateWrapper);
             }
-            const { value } = this.field;
+            const { push, remove } = this.field;
+            const names = (this.field.value ?? []).map((item: any, index: number) => `${this.field.name}[${index}]`);
             const component = this.props.children ?? this.props.component;
-            return component!({ value });
+            return component!({ names, push, remove });
         }
 
     }
-    Object.defineProperty(FieldReaderComponent, "name", { value: "Field Reader" });
-    Object.defineProperty(FieldReaderComponent, "displayName", { value: `(${form.name})(Field Reader)` });
-    return FieldReaderComponent;
+    Object.defineProperty(FieldArrayComponent, "name", { value: "Field Array" });
+    Object.defineProperty(FieldArrayComponent, "displayName", { value: `(${form.name})(Field Array)` });
+    return FieldArrayComponent;
 }

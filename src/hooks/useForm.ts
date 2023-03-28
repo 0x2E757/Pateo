@@ -1,7 +1,7 @@
-import React from "react";
+import { useState } from "react";
 import { Form } from "../forms/form";
 
 export const useForm = <T>(name?: string) => {
-    const [form] = React.useState(new Form<T>(name));
+    const [form] = useState(new Form<T>(name));
     return form;
 };
