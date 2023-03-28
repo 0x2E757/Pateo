@@ -1,22 +1,21 @@
 import * as React from "react";
 import { Extend } from "../types";
-import { Form } from "../form";
-import { Field } from "../field";
+import { Form, Field } from "../forms";
 
 type PropsBase = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
-interface IFieldReaderProps {
-    name: string;
-    children?: (field: { value: any }) => JSX.Element;
-    component?: (field: { value: any }) => JSX.Element;
-}
+export type FieldReaderProps = {
+    name: string,
+    children?: (field: { value: any }) => JSX.Element,
+    component?: (field: { value: any }) => JSX.Element,
+};
 
 export function getFieldReaderComponent(form: Form) {
-    class FieldReaderComponent extends React.PureComponent<Extend<PropsBase, IFieldReaderProps>> {
+    class FieldReaderComponent extends React.PureComponent<Extend<PropsBase, FieldReaderProps>> {
 
         private field: Field;
 
-        constructor(props: Extend<PropsBase, IFieldReaderProps>) {
+        constructor(props: Extend<PropsBase, FieldReaderProps>) {
             super(props);
             this.field = form.getField(props.name);
         }

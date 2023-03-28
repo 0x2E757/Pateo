@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import { PromiseExt } from "@0x2e757/promise-ext";
 export { PromiseExt };
 
@@ -10,71 +8,14 @@ export { StaticWrapper, DynamicWrapper };
 import { Constructor, ISubscribable } from "./types";
 export type { Constructor, ISubscribable };
 
-import { Form } from "./form";
-export { Form };
+import { Form, Field } from "./forms";
+export { Form, Field };
 
-import { Field } from "./field";
-export { Field };
+import { subscribe } from "./decorators";
+export { subscribe };
 
-export const subscribe = (...subscribables: ISubscribable[]) => {
-    return <T extends Constructor<React.Component>>(component: T): T => {
-        class SubscribedComponent extends component {
-            constructor(...args: any[]) {
-
-                super(...args);
-
-                const forceUpdateWrapper = (): void => this.forceUpdate();
-                const initialComponentDidMount = this.componentDidMount;
-                const initialComponentWillUnmount = this.componentWillUnmount;
-
-                this.componentDidMount = (): void => {
-                    for (const wrapper of subscribables)
-                        wrapper.subscribe(forceUpdateWrapper);
-                    if (initialComponentDidMount)
-                        initialComponentDidMount();
-                };
-
-                this.componentWillUnmount = (): void => {
-                    for (const wrapper of subscribables)
-                        wrapper.unsubscribe(forceUpdateWrapper);
-                    if (initialComponentWillUnmount)
-                        initialComponentWillUnmount();
-                };
-
-            }
-        }
-        Object.defineProperty(SubscribedComponent, "name", { value: component.name });
-        Object.defineProperty(SubscribedComponent, "displayName", { value: `(Subscribed)(${component.name})` });
-        return SubscribedComponent;
-    }
-}
-
-export const useWrapper = <T>(wrapper: IStaticWrapper<T>) => {
-    const [value, setValue] = React.useState<T>(wrapper.emit());
-    React.useEffect(() => {
-        wrapper.subscribe(setValue);
-        return () => {
-            wrapper.unsubscribe(setValue);
-        };
-    });
-    return [value, wrapper.set] as [T, typeof wrapper.set];
-};
-
-export const useSubscribable = <T>(wrapper: IWrapper<T>) => {
-    const [value, setValue] = React.useState<T>(wrapper.emit());
-    React.useEffect(() => {
-        wrapper.subscribe(setValue);
-        return () => {
-            wrapper.unsubscribe(setValue);
-        };
-    });
-    return value;
-};
-
-export const useForm = <T>(name?: string) => {
-    const [form] = React.useState(new Form<T>(name));
-    return form;
-};
+import { useWrapper, useSubscribable, useForm } from "./hooks";
+export { useWrapper, useSubscribable, useForm };
 
 export default {
     PromiseExt,
@@ -85,4 +26,5 @@ export default {
     subscribe,
     useWrapper,
     useSubscribable,
+    useForm,
 };

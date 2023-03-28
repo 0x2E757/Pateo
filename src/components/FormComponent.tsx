@@ -1,15 +1,15 @@
 import * as React from "react";
 import { Extend, DeepReadonlyPartial } from "../types";
-import { Form } from "../form";
+import { Form } from "../forms";
 
 type FormPropsBase = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
 
-interface IFormProps<T> {
-    onSubmit?: (values: DeepReadonlyPartial<T>) => void;
-}
+export type FormProps<T> = {
+    onSubmit?: (values: DeepReadonlyPartial<T>) => void,
+};
 
 export function getFormComponent<T>(form: Form<T>) {
-    class FormComponent extends React.PureComponent<Extend<FormPropsBase, IFormProps<T>>> {
+    class FormComponent extends React.PureComponent<Extend<FormPropsBase, FormProps<T>>> {
 
         private updateFormParams = (): void => {
             if (this.props.onSubmit !== undefined)

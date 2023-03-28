@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Form } from "../form";
+import { Form } from "../forms";
 
 type ResetPropsBase = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 

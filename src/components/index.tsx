@@ -1,6 +1,6 @@
-export { getFormComponent } from "./form";
-export { getSubmitComponent } from "./submit";
-export { getResetComponent } from "./reset";
-export { getFieldComponent } from "./fields/field";
-export { getInputComponent } from "./fields/input";
-export { getFieldReaderComponent } from "./fieldreader";
+export { getFormComponent } from "./FormComponent";
+export { getSubmitComponent } from "./SubmitComponent";
+export { getResetComponent } from "./ResetComponent";
+export { getFieldComponent } from "./FieldComponents/FieldComponent";
+export { getInputComponent } from "./FieldComponents/InputComponent";
+export { getFieldReaderComponent } from "./FieldReaderComponent";

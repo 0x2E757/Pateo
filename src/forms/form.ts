@@ -1,6 +1,6 @@
-import * as utils from "./utils";
-import * as components from "./components";
-import { DeepPartial, DeepReadonlyPartial, Subscriber } from "./types";
+import * as utils from "../utils";
+import * as components from "../components";
+import { DeepPartial, DeepReadonlyPartial, Subscriber } from "../types";
 import { Field } from "./field";
 
 export class Form<T = {}> {
@@ -50,7 +50,7 @@ export class Form<T = {}> {
                 this.getField(key.toLowerCase()).setSubmissionErrors(fieldErrors);
             } else {
                 const field = this.fields.get(key)!;
-                field.validate();
+                field.submitFailed = field.validate() === false;
                 field.trigger();
             }
         }
@@ -64,6 +64,10 @@ export class Form<T = {}> {
             this.fields.set(nameLowerCase, field);
         }
         return field;
+    }
+
+    public getValues = (): DeepReadonlyPartial<T> => {
+        return { ...this.values };
     }
 
     public reset = (): void => {
@@ -107,7 +111,7 @@ export class Form<T = {}> {
 
     public trigger = (): void => {
         for (const subscriber of this.subscribers)
-            subscriber(this.values);
+            subscriber(this.getValues());
     }
 
 }

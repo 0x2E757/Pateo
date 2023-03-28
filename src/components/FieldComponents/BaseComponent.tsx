@@ -1,18 +1,17 @@
 import * as React from "react";
-import { Extend } from "../../types";
-import { Form } from "../../form";
-import { Field } from "../../field";
+import { Extend, Validator } from "../../types";
+import { Form, Field } from "../../forms";
 
-export interface IFieldProps {
-    name: string;
-}
+export type BaseProps = {
+    name: string,
+};
 
 export function getBaseComponent<P, S = {}>(form: Form) {
-    class BaseComponent extends React.PureComponent<Extend<P, IFieldProps>, S> {
-        
+    class BaseComponent extends React.PureComponent<Extend<P, BaseProps>, S> {
+
         protected field: Field;
 
-        constructor(props: Extend<P, IFieldProps>) {
+        constructor(props: Extend<P, BaseProps>) {
             super(props);
             this.field = form.getField(props.name);
         }
@@ -21,15 +20,13 @@ export function getBaseComponent<P, S = {}>(form: Form) {
             this.forceUpdate();
         }
 
-        protected updateField = (): void => {
-            if (this.field.name !== this.props.name) {
-                this.field.unsubscribe(this.fourceUpdateWrapper);
+        protected updateField = (validate?: Validator | Validator[], initialValue?: any, defaultValue?: any): void => {
+            this.field.unsubscribe(this.fourceUpdateWrapper);
+            if (this.field.name !== this.props.name)
                 this.field = form.getField(this.props.name);
-                this.field.subscribe(this.fourceUpdateWrapper);
-            }
-        }
-
-        public componentDidMount = (): void => {
+            this.field.setValidators(validate === undefined ? [] : Array.isArray(validate) ? validate : [validate]);
+            this.field.setInitialValue(initialValue);
+            this.field.setDefaultValue(defaultValue);
             this.field.subscribe(this.fourceUpdateWrapper);
         }
 

@@ -1,4 +1,4 @@
-import { Validator, Subscriber } from "./types";
+import { Validator, Subscriber } from "../types";
 import { Form } from "./form";
 
 type InputProps = {
@@ -125,8 +125,16 @@ export class Field {
     }
 
     public reset = (): void => {
-        if (this.value !== this.defaultValue)
-            this.change(this.defaultValue);
+        if (this.value !== this.defaultValue) {
+            this.value = this.defaultValue;
+            this.inputProps.value = this.defaultValue ?? "";
+            this.form.setValue(this.name, this.defaultValue);
+        }
+        this.visited = false;
+        this.touched = false;
+        this.submitFailed = false;
+        this.validate();
+        this.trigger();
     }
 
     public subscribe = (subscriber: Subscriber): void => {
