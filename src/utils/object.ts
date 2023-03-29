@@ -15,7 +15,7 @@ const codes = {
     nine: '9'.charCodeAt(0),
 };
 
-const stringToPathObject = (string: string): Path => {
+function stringToPathObject(string: string): Path {
     let path!: Path;
     let numbersOnly: boolean;
     let startIndex: number = string.length;
@@ -57,7 +57,7 @@ const stringToPathObject = (string: string): Path => {
     return path;
 }
 
-const existsInner = (object: any, path: Path): any => {
+function existsInner(object: any, path: Path): any {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
         if (object[propertyName] === undefined)
@@ -68,12 +68,12 @@ const existsInner = (object: any, path: Path): any => {
     }
 }
 
-export const exists = (object: any, path: string): any => {
+export function exists(object: any, path: string): any {
     let pathObject = stringToPathObject(path);
     return existsInner(object, pathObject);
 }
 
-const getInner = (object: any, path: Path): any => {
+function getInner(object: any, path: Path): any {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
         if (object[propertyName] === undefined)
@@ -84,12 +84,12 @@ const getInner = (object: any, path: Path): any => {
     }
 }
 
-export const get = (object: any, path: string): any => {
+export function get(object: any, path: string): any {
     let pathObject = stringToPathObject(path);
     return getInner(object, pathObject);
 }
 
-const setInner = (object: any, path: Path, value: any): void => {
+function setInner(object: any, path: Path, value: any): void {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
         const propertyValue = object[propertyName] ?? (path.next.accessKind === AccessKind.Array ? [] : {});
@@ -99,18 +99,18 @@ const setInner = (object: any, path: Path, value: any): void => {
     }
 }
 
-export const set = (object: any, path: string, value: any): void => {
+export function set(object: any, path: string, value: any): void {
     setInner(object, stringToPathObject(path), value);
 }
 
-const deleleProperty = (path: Path, object: any, propertyName: string | number): void => {
+function deleleProperty(path: Path, object: any, propertyName: string | number): void {
     if (path.accessKind !== AccessKind.Array)
         delete object[propertyName];
     else
         object[propertyName] = null;
 }
 
-const removeInner = (object: any, path: Path): void => {
+function removeInner(object: any, path: Path): void {
     const propertyName = path.accessKind === AccessKind.Object ? path.name! : path.index!;
     if (path.next !== undefined) {
         const propertyValue = object[propertyName] ?? (path.next.accessKind === AccessKind.Array ? [] : {});
@@ -122,7 +122,7 @@ const removeInner = (object: any, path: Path): void => {
     }
 }
 
-export const remove = (object: any, path: string): void => {
+export function remove(object: any, path: string): void {
     let pathObject = stringToPathObject(path);
     removeInner(object, pathObject);
 }

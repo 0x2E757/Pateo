@@ -6,7 +6,7 @@ type PropsBase = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTML
 
 type ChildrenProps = {
     names: string[],
-    push: (value: any) => void,
+    push: (value?: any) => void,
     remove: (index: number) => void,
 };
 

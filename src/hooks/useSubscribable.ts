@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ISubscribable } from "../types";
 
-export const useSubscribable = <T>(subscribable: ISubscribable<T>, initialValue: T) => {
+export function useSubscribable<T>(subscribable: ISubscribable<T>, initialValue: T) {
 
     const [value, setValue] = useState<T>(initialValue);
     const tempValue = useRef(value);

@@ -192,7 +192,7 @@ export class Field {
             }
         }
         this.value.splice(index, 1);
-        this.change(this.value);
+        this.change(this.value.length > 0 ? this.value : undefined);
     }
 
     public subscribe = (subscriber: Subscriber): void => {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { IWrapper, IStaticWrapper } from "@0x2e757/wrappers";
 
-export const useWrapper = <T>(wrapper: IWrapper<T>) => {
+export function useWrapper<T>(wrapper: IWrapper<T>) {
 
     const [value, setValue] = useState<T>(wrapper.emit());
     const tempValue = useRef(value);
