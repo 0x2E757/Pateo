@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { IStaticWrapper } from "@0x2e757/wrappers";
+import { IWrapper, IStaticWrapper } from "@0x2e757/wrappers";
 
-export const useWrapper = <T>(wrapper: IStaticWrapper<T>) => {
+export const useWrapper = <T>(wrapper: IWrapper<T>) => {
 
     const [value, setValue] = useState<T>(wrapper.emit());
     const tempValue = useRef(value);
@@ -29,6 +29,6 @@ export const useWrapper = <T>(wrapper: IStaticWrapper<T>) => {
         flag.current = true;
     }
 
-    return [value, wrapper.set] as [T, typeof wrapper.set];
+    return [value, (wrapper as IStaticWrapper<T>).set] as [T, (value: T, debounce?: number) => void];
 
-};
+}

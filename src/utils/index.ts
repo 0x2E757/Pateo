@@ -1,7 +1,7 @@
 import { ValidationErrors } from "../types";
 export { exists, get, set, remove } from "./object";
 
-export function uuid(): string {
+export const uuid = (): string => {
     // https://stackoverflow.com/a/873856
     const result: string[] = new Array(36);
     const hexDigits: string = "0123456789abcdef";
@@ -14,7 +14,7 @@ export function uuid(): string {
     return result.join("");
 }
 
-export function flattenObject(object: any, parentPropertyName?: string, result: ValidationErrors = {}) {
+export const flattenObject = (object: any, parentPropertyName?: string, result: ValidationErrors = {}) => {
     for (const key in object) {
         const propertyName = parentPropertyName ? parentPropertyName + "." + key : key;
         if (typeof object[key] === "object")
@@ -28,7 +28,7 @@ export function flattenObject(object: any, parentPropertyName?: string, result: 
     return result;
 }
 
-export function lowerCaseKeys(object: any) {
+export const lowerCaseKeys = (object: any) => {
     const result: any = {};
     for (const key in object)
         result[key.toLowerCase()] = object[key];

@@ -31,4 +31,4 @@ export const useSubscribable = <T>(subscribable: ISubscribable<T>, initialValue:
 
     return value;
 
-};
+}
