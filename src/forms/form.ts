@@ -40,23 +40,70 @@ export class Form<T = {}> {
     }
 
     public valueExists = (path: string): boolean => {
-        return utils.exists(this.values, path);
+        const pathLowerCase = path.toLowerCase();
+        return utils.exists(this.values, pathLowerCase);
     }
 
-    public getValue = (path: string): void => {
-        return utils.get(this.values, path);
+    public getValue = (path: string): any => {
+        const pathLowerCase = path.toLowerCase();
+        return utils.get(this.values, pathLowerCase);
     }
 
     public setValue = (path: string, value: any): void => {
+        const pathLowerCase = path.toLowerCase();
         if (value !== undefined && value !== "")
-            utils.set(this.values, path, value);
+            utils.set(this.values, pathLowerCase, value);
         else
-            utils.remove(this.values, path);
+            utils.remove(this.values, pathLowerCase);
+        this.trigger();
+    }
+
+    private initializeArraysInner = (object: any, propertyName: string) => {
+        if (typeof object === "object") {
+            if (Array.isArray(object)) {
+                const field = this.getField(propertyName);
+                if (field.value === undefined) {
+                    field.value = object;
+                    field.inputProps.value = object ?? "";
+                    field.validate();
+                    field.trigger();
+                }
+            }
+            this.initializeArrays(object, propertyName);
+        }
+    }
+
+    private initializeArrays = (object: any, parentPropertyName: string = "") => {
+        if (Array.isArray(object)) {
+            for (let index = 0; index < object.length; index += 1) {
+                const propertyName = parentPropertyName ? `${parentPropertyName}[${index}]` : `[${index}]`;
+                this.initializeArraysInner(object[index], propertyName);
+            }
+        } else {
+            for (const key in object) {
+                const propertyName = parentPropertyName ? `${parentPropertyName}.${key}` : key;
+                this.initializeArraysInner(object[key], propertyName);
+            }
+        }
+    }
+
+    public setValues = (values: any): void => {
+        const normalizedValues = utils.lowerCaseKeys(utils.flattenObject(values));
+        for (const key in normalizedValues) {
+            const field = this.getField(key);
+            const value = normalizedValues[key];
+            utils.set(this.values, key, value);
+            field.value = value;
+            field.inputProps.value = value ?? "";
+            field.validate();
+            field.trigger();
+        }
+        this.initializeArrays(this.values);
         this.trigger();
     }
 
     public setSubmissionErrors = (errors: Object): void => {
-        const normalizedErrors = utils.lowerCaseKeys(utils.flattenObject(errors));
+        const normalizedErrors = utils.lowerCaseKeys(utils.flattenErrorsObject(errors));
         const keys = this.getKeys();
         for (const key of keys) {
             if (key in normalizedErrors) {
@@ -74,7 +121,7 @@ export class Form<T = {}> {
         const nameLowerCase = name.toLowerCase();
         let field: Field | undefined = this.fields.get(nameLowerCase);
         if (field === undefined) {
-            field = new Field(this, nameLowerCase);
+            field = new Field(this, nameLowerCase, this.getValue(nameLowerCase));
             this.fields.set(nameLowerCase, field);
         }
         return field;

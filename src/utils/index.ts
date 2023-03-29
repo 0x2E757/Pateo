@@ -1,4 +1,4 @@
-import { ValidationErrors } from "../types";
+import { FlattenedObject } from "../types";
 export { exists, get, set, remove } from "./object";
 
 export function uuid(): string {
@@ -14,17 +14,48 @@ export function uuid(): string {
     return result.join("");
 }
 
-export function flattenObject(object: any, parentPropertyName?: string, result: ValidationErrors = {}) {
-    for (const key in object) {
-        const propertyName = parentPropertyName ? parentPropertyName + "." + key : key;
-        if (typeof object[key] === "object")
-            if (Array.isArray(object[key]) && typeof object[key][0] === "string")
-                result[propertyName] = object[key];
-            else
-                flattenObject(object[key], propertyName, result);
+function flattenObjectInner(object: any, propertyName: string, result: FlattenedObject = {}) {
+    if (typeof object === "object")
+        flattenObject(object, propertyName, result);
+    else
+        result[propertyName] = object;
+}
+
+export function flattenObject(object: any, parentPropertyName?: string, result: FlattenedObject = {}) {
+    if (Array.isArray(object))
+        for (let index = 0; index < object.length; index += 1) {
+            const propertyName = parentPropertyName ? `${parentPropertyName}[${index}]` : `[${index}]`;
+            flattenObjectInner(object[index], propertyName, result);
+        }
+    else
+        for (const key in object) {
+            const propertyName = parentPropertyName ? `${parentPropertyName}.${key}` : key;
+            flattenObjectInner(object[key], propertyName, result);
+        }
+    return result;
+}
+
+function flattenErrorsObjectInner(object: any, propertyName: string, result: FlattenedObject = {}) {
+    if (typeof object === "object")
+        if (Array.isArray(object) && typeof object[0] === "string")
+            result[propertyName] = object;
         else
-            result[propertyName] = object[key];
-    }
+            flattenErrorsObject(object, propertyName, result);
+    else
+        result[propertyName] = object;
+}
+
+export function flattenErrorsObject(object: any, parentPropertyName?: string, result: FlattenedObject = {}) {
+    if (Array.isArray(object))
+        for (let index = 0; index < object.length; index += 1) {
+            const propertyName = parentPropertyName ? `${parentPropertyName}[${index}]` : `[${index}]`;
+            flattenErrorsObjectInner(object[index], propertyName, result);
+        }
+    else
+        for (const key in object) {
+            const propertyName = parentPropertyName ? `${parentPropertyName}.${key}` : key;
+            flattenErrorsObjectInner(object[key], propertyName, result);
+        }
     return result;
 }
 

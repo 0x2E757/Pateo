@@ -7,7 +7,7 @@ export type Constructor<T = any> = { new(...args: any[]): T };
 export type Subscriber<T = any> = (value: T) => void;
 
 export type Validator = (value: any) => string | undefined;
-export type ValidationErrors = { [key: string]: string | string[] };
+export type FlattenedObject = { [key: string]: string | string[] };
 
 export interface ISubscribable<T = any> {
     subscribe: (subscriber: Subscriber<T>) => void;

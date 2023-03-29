@@ -30,7 +30,7 @@ export class Field {
 
     private subscribers: Set<Subscriber>;
 
-    public constructor(form: Form, name: string) {
+    public constructor(form: Form, name: string, initialValue: any) {
 
         this.form = form;
         this.name = name;
@@ -38,9 +38,9 @@ export class Field {
         this.validators = [];
         this.errors = [];
 
-        this.initialValue = undefined;
+        this.initialValue = initialValue;
         this.defaultValue = undefined;
-        this.value = undefined;
+        this.value = initialValue;
 
         this.active = false;
         this.visited = false;
@@ -52,7 +52,7 @@ export class Field {
             onChange: (event: React.ChangeEvent<HTMLInputElement>) => this.change(event.target.value),
             onFocus: () => this.focus(),
             onBlur: () => this.blur(),
-            value: "",
+            value: initialValue ?? "",
         }
 
         this.subscribers = new Set();
