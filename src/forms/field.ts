@@ -77,7 +77,7 @@ export class Field {
             this.initialValue = value;
             if (this.value === undefined) {
                 this.value = value;
-                this.inputProps.value = value;
+                this.inputProps.value = value ?? "";
                 this.form.setValue(this.name, value);
                 this.validate();
                 this.trigger();
@@ -166,7 +166,7 @@ export class Field {
         this.submitFailed = field.submitFailed;
         this.inputProps = {
             ...this.inputProps,
-            value: field.value,
+            value: field.value ?? "",
         };
         this.trigger();
     }
