@@ -108,7 +108,7 @@ export class Form<T = {}> {
         for (const key of keys) {
             if (key in normalizedErrors) {
                 const fieldErrors = typeof normalizedErrors[key] == "string" ? [normalizedErrors[key] as string] : normalizedErrors[key] as string[];
-                this.getField(key.toLowerCase()).setSubmissionErrors(fieldErrors);
+                this.getField(key).setSubmissionErrors(fieldErrors);
             } else {
                 const field = this.fields.get(key)!;
                 field.submitFailed = field.validate() === false;
@@ -143,20 +143,14 @@ export class Form<T = {}> {
     }
 
     private checkCanSubmit = (): boolean => {
-        let allValid = true;
         const keys = this.getKeys();
-        for (const key of keys) {
-            const field = this.fields.get(key)!;
-            field.submitFailed = field.validate() === false;
-            if (field.submitFailed) {
-                field.trigger();
-                allValid = false;
-            }
-        }
-        return allValid;
+        for (const key of keys)
+            if (this.fields.get(key)!.errors.length > 0)
+                return false;
+        return true;
     }
 
-    public submit = (callback?: (values: DeepReadonlyPartial<T>) => void): void => {
+    public submit = (callback?: (values: DeepReadonlyPartial<T>) => void): boolean => {
         if (this.checkCanSubmit()) {
             if (callback)
                 callback(this.values);
@@ -164,7 +158,9 @@ export class Form<T = {}> {
                 this.onSubmit(this.values);
             else
                 console.warn(`Unhandled submit of ${this.name}`, this.values);
-        }
+            return true;
+        } else
+            return false;
     }
 
     public subscribe = (subscriber: Subscriber<DeepPartial<T>>): void => {

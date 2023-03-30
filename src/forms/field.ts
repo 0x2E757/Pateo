@@ -112,6 +112,7 @@ export class Field {
 
     public change = (value: any): void => {
         this.value = value;
+        this.submitFailed = false;
         this.inputProps.value = value ?? "";
         this.form.setValue(this.name, value);
         this.validate();
