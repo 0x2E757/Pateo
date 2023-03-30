@@ -143,11 +143,17 @@ export class Form<T = {}> {
     }
 
     private checkCanSubmit = (): boolean => {
+        let allValid = true;
         const keys = this.getKeys();
-        for (const key of keys)
-            if (this.fields.get(key)!.errors.length > 0)
-                return false;
-        return true;
+        for (const key of keys) {
+            const field = this.fields.get(key)!;
+            field.submitFailed = field.errors.length > 0;
+            if (field.submitFailed) {
+                allValid = false;
+                field.trigger();
+            }
+        }
+        return allValid;
     }
 
     public submit = (callback?: (values: DeepReadonlyPartial<T>) => void): boolean => {
