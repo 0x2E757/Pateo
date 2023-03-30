@@ -19,6 +19,7 @@ export class Form<T = {}> {
     private values: DeepPartial<T>;
     private fields: Map<string, Field>;
     private subscribers: Set<Subscriber<DeepPartial<T>>>;
+    private triggerEnabled: boolean;
 
     public constructor(name?: string) {
         this.name = name ?? utils.uuid();
@@ -33,6 +34,7 @@ export class Form<T = {}> {
         this.values = {};
         this.fields = new Map();
         this.subscribers = new Set();
+        this.triggerEnabled = true;
     }
 
     public getKeys = (): IterableIterator<string> => {
@@ -58,47 +60,32 @@ export class Form<T = {}> {
         this.trigger();
     }
 
-    private initializeArraysInner = (object: any, propertyName: string) => {
-        if (typeof object === "object") {
-            if (Array.isArray(object)) {
-                const field = this.getField(propertyName);
-                if (field.value === undefined) {
-                    field.value = object;
-                    field.inputProps.value = object ?? "";
-                    field.validate();
-                    field.trigger();
-                }
-            }
-            this.initializeArrays(object, propertyName);
-        }
-    }
-
-    private initializeArrays = (object: any, parentPropertyName: string = "") => {
-        if (Array.isArray(object)) {
+    public setValuesInner = (object: any, parentPropertyName: string): void => {
+        if (Array.isArray(object))
             for (let index = 0; index < object.length; index += 1) {
                 const propertyName = parentPropertyName ? `${parentPropertyName}[${index}]` : `[${index}]`;
-                this.initializeArraysInner(object[index], propertyName);
+                if (typeof object[index] === "object") {
+                    this.setValuesInner(object[index], propertyName);
+                    this.getField(propertyName).change(utils.get(this.values, propertyName));
+                } else
+                    this.getField(propertyName).change(object[index]);
             }
-        } else {
+        else
             for (const key in object) {
-                const propertyName = parentPropertyName ? `${parentPropertyName}.${key}` : key;
-                this.initializeArraysInner(object[key], propertyName);
+                const propertyName = parentPropertyName ? `${parentPropertyName}.${key.toLowerCase()}` : key.toLowerCase();
+                if (typeof object[key] === "object") {
+                    this.setValuesInner(object[key], propertyName);
+                    this.getField(propertyName).change(utils.get(this.values, propertyName));
+                } else
+                    this.getField(propertyName).change(object[key]);
             }
-        }
     }
 
     public setValues = (values: any): void => {
-        const normalizedValues = utils.lowerCaseKeys(utils.flattenObject(values));
-        for (const key in normalizedValues) {
-            const field = this.getField(key);
-            const value = normalizedValues[key];
-            utils.set(this.values, key, value);
-            field.value = value;
-            field.inputProps.value = value ?? "";
-            field.validate();
-            field.trigger();
-        }
-        this.initializeArrays(this.values);
+        this.values = {};
+        this.triggerEnabled = false;
+        this.setValuesInner(values, "");
+        this.triggerEnabled = true;
         this.trigger();
     }
 
@@ -178,8 +165,9 @@ export class Form<T = {}> {
     }
 
     public trigger = (): void => {
-        for (const subscriber of this.subscribers)
-            subscriber(this.getValues());
+        if (this.triggerEnabled)
+            for (const subscriber of this.subscribers)
+                subscriber(this.getValues());
     }
 
 }

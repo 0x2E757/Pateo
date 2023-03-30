@@ -42,7 +42,6 @@ export function getFieldArrayComponent(form: Form) {
             if (this.field.name !== this.props.name) {
                 this.field.unsubscribe(this.fourceUpdateWrapper);
                 this.field = form.getField(this.props.name);
-                this.field.setDefaultValue([]);
                 this.field.subscribe(this.fourceUpdateWrapper);
             }
             const { push, remove } = this.field;
