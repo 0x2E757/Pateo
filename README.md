@@ -1,6 +1,6 @@
 # Pateo
 
-Lightweight library for react with native promise wrapper that can be cancelled and variable wrappers.
+Lightweight library for react with native promise wrapper that can be cancelled ([PromiseExt](https://github.com/0x2E757/PromiseExt)), variable wrappers ([Wrappers](https://github.com/0x2E757/Wrappers)) and interactive forms.
 
 TypeScript code transpiled to ES2015 JavaScript.
 
