@@ -16,6 +16,14 @@ First of all, pateo contains exports for the PromiseExt and wrapper classes. You
 
 Secondly, pateo has helper functions for integrating wrappers into a React project and a form class for building interactive forms.
 
+### Examples on StackBlitz
+
+* [Counter example using wrapper](https://stackblitz.com/edit/pateo-example-rsh9xv?file=src%2Fwrappers.ts,src%2Fcounter.tsx)
+* [Global form and useSubscribable](https://stackblitz.com/edit/pateo-example-ynur8o?file=src%2Fformreader.tsx,src%2Fglobalform.tsx)
+* [Form custom field components](https://stackblitz.com/edit/pateo-example-n8quoy?file=src%2Fexampleform.tsx)
+* [Form submission errors](https://stackblitz.com/edit/pateo-example-zvgyea?file=src%2Fexampleform.tsx)
+
+You can find explanations to each example further in this readme.
 
 ### How to import
 
@@ -187,7 +195,6 @@ Create `globalform.tsx`:
 import * as f from "./forms";
 
 export function GlobalForm() {
-
     return (
         <f.myForm.Form>
             <f.myForm.Input name="username" />
@@ -195,7 +202,6 @@ export function GlobalForm() {
             <f.myForm.Submit value="Submit!" />
         </f.myForm.Form>
     );
-
 }
 ```
 
@@ -250,8 +256,17 @@ export function ExampleForm() {
 
     return (
         <form.Form>
-            <form.Field component={ExampleField} name="username" validate={required} />
-            <form.Field component={ExampleField} name="password" type="password" validate={required} />
+            <form.Field 
+                component={ExampleField}
+                name="username"
+                validate={required}
+            />
+            <form.Field
+                component={ExampleField}
+                name="password"
+                type="password"
+                validate={required}
+            />
             <form.Submit value="Submit" />
         </form.Form>
     );
@@ -352,8 +367,19 @@ export function ExampleForm() {
 
     return (
         <form.Form>
-            <form.Field component={ExampleField} name="username" validate={required} disabled={loading} />
-            <form.Field component={ExampleField} name="password" type="password" validate={required} disabled={loading} />
+            <form.Field
+                component={ExampleField}
+                name="username"
+                validate={required}
+                disabled={loading}
+            />
+            <form.Field
+                component={ExampleField}
+                name="password"
+                type="password"
+                validate={required}
+                disabled={loading}
+            />
             <form.Submit value="Submit" disabled={loading} />
         </form.Form>
     );
@@ -429,8 +455,19 @@ export function ExampleForm() {
 
     return (
         <form.Form>
-            <form.Field component={ExampleField} name="username" validate={required} disabled={loading} />
-            <form.Field component={ExampleField} name="password" type="password" validate={required} disabled={loading} />
+            <form.Field
+                component={ExampleField}
+                name="username"
+                validate={required}
+                disabled={loading}
+            />
+            <form.Field
+                component={ExampleField}
+                name="password"
+                type="password"
+                validate={required}
+                disabled={loading}
+            />
             <form.Submit value="Submit" disabled={loading} />
         </form.Form>
     );
