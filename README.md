@@ -27,7 +27,7 @@ You can find explanations to each example further in this readme.
 
 ### How to import
 
-Everything in master object:
+Everything in a master object:
 ```typescript
 import Pateo from "pateo";
 ```
@@ -75,7 +75,7 @@ export function CounterIncrementer() {
 
 ### Form basic example
 
-There are multiple ways to use `Form` class in you application. Let's get started with local form that exists just in terms of component lifecycle.
+There are multiple ways to use `Form` class in you application. Let's get started with a local form that exists just in terms of the component's lifecycle.
 
 Create `exampleform.tsx` with `ExampleForm` component:
 ```typescript
@@ -163,7 +163,7 @@ return (
 
 ### Global form and useSubscribable
 
-Forms can also exist outside of component rendered by, being "global". For example it can be useful if we want form values to persist between form components remounting. In that case we create forms same as wrappers.
+Forms can also exist outside of component rendered by, being "global". For example it can be useful if we want form values to persist between form component remounting. In that case we create forms same as wrappers.
 
 Create `forms.ts`:
 ```typescript
@@ -205,11 +205,11 @@ export function GlobalForm() {
 }
 ```
 
-In the `FormReader` component we're using `useSubscribable` hook. It takes two argument, subscribable object (must contains `subscribe` and `unsubscribe` methods similar to wrappers) and initial value. This hook can be used with any kind of objects, not just forms.
+In the `FormReader` component we're using `useSubscribable` hook. It takes two arguments, subscribable object (must contains `subscribe` and `unsubscribe` methods similar to wrappers) and initial value. This hook can be used with any kind of objects, not just forms.
 
 ### Form validation
 
-Form field support validation. Let's make simple example:
+Form fields support validation. Let's make simple example:
 ```typescript
 import { useForm } from "pateo";
 
@@ -232,11 +232,11 @@ export function ExampleForm() {
 }
 ```
 
-Now when we're trying to submit form will ensure that every field value is valid and only then proceed submitting. The `validate` prop can be array of functions so the field will have multiple different validators. Field being considered as valid if all validation functions returned `undefined`.
+Now when we're trying to perform submit the form will ensure that every field value is valid and only then proceed submitting. The `validate` prop can be array of functions so the field will have multiple different validators. Field is considered as valid if all validation functions returned `undefined`.
 
 ### Form custom field components
 
-Now let's take a loot at custom form fields:
+Now let's take a look at custom form fields:
 ```typescript
 import { Field, useForm } from "pateo";
 
@@ -274,7 +274,7 @@ export function ExampleForm() {
 }
 ```
 
-Component passed to `Field` will received all props passed to `Field` extended by additional `field` prop, that contains form's field object. This object can be used for creating various functionality. The base thing we want to use is `field.inputProps` property, which contains `value`, `onFocus`, `onChange` and `onBlur` props. This example also is using validation, but user can't see any errors. Let's show them!
+Component passed to `Field` will received all props passed to `Field` (except `name`, `component`, `initialValue`, `defaultValue` and `validate`) extended by additional `field` prop, that contains form's field object. This object can be used for creating various functionality. The base thing we want to use is `field.inputProps` property, which contains `value`, `onFocus`, `onChange` and `onBlur` props. This example also is using validation, but user can't see any errors. Let's show them!
 
 ```typescript
 function ExampleField({ field, ...props }: { field: Field }) {
@@ -289,7 +289,7 @@ function ExampleField({ field, ...props }: { field: Field }) {
 }
 ```
 
-Now every validation errors will be displayed with the input. But the problem is that erorrs are displayed even before user typed anything in field. Let's add some conditions:
+Now every validation errors will be displayed with the input. But the problem is that erorrs are displayed even before user typed anything in the field. Let's add some conditions:
 ```typescript
 return (
     <div>
@@ -418,7 +418,7 @@ form.onSubmit = (values) => {
 
 You can also use `setSubmissionErrors` method for creating complex multi-field validations. Submission errors will be erased as soon as field validators will be triggered. 
 
-\* Note, that validators passed to field must be the same value every time (don't implemented them inside component function, it's going to be new object every rerender), otherwise submissions erors will get erased immediately, because field will think it got new validators and needs to revalidate the value.
+\* Note, that validators passed to field must be the same value every time (don't implement them inside component function, it's going to be a new object every rendering), otherwise submissions erors will get erased immediately, because field will think it got new validators and needs to revalidate the value.
 
 ### PromiseExt with forms
 
